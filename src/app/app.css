@@ -1,0 +1,21 @@
+:root {
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+}
+
+html {
+  font-size: 10px;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+}
+
+h2 {
+  padding-top: 0;
+}
+
+p {
+  background: transparent;
+}

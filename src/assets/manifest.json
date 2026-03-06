@@ -1,0 +1,14 @@
+{
+    "hotReloadFix": {
+      "text": "import RefreshRuntime from \"${spaBaseUrl}@react-refresh\";RefreshRuntime.injectIntoGlobalHook(window);window.$RefreshReg$ = () => {};window.$RefreshSig$ = () => (type) => type;window.__vite_plugin_react_preamble_installed__ = true;",
+      "module": true,
+      "order": 0
+    },
+    "index.html": {
+      "file": "src/main.tsx",
+      "src": "index.html",
+      "isEntry": true,
+      "module": true,
+      "order": 1
+    }
+}
