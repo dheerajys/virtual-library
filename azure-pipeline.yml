@@ -1,0 +1,64 @@
+name: '$(BuildDefinitionName)_$(Year:yyyy).$(Month).$(DayOfMonth)$(Rev:.r)'
+trigger:
+  paths:
+    include:
+      - '*'
+    exclude:
+      - '**/.git/**'
+
+variables:
+  vmImageName: 'windows-latest'
+
+stages:
+  - stage: Build
+    displayName: Build stage
+    jobs:
+      - job: Build
+        displayName: Build
+        pool:
+          vmImage: $(vmImageName)
+        steps:
+          - task: Npm@1
+            displayName: 'npm ci'
+            inputs:
+              command: 'ci'
+          - task: Npm@1
+            displayName: 'npm lint'
+            inputs:
+              command: 'custom'
+              customCommand: 'run lint'
+          - task: Npm@1
+            displayName: 'npm test'
+            inputs:
+              command: 'custom'
+              customCommand: 'run test:coverage'
+          - task: Npm@1
+            displayName: 'npm build storybook'
+            inputs:
+              command: 'custom'
+              customCommand: 'run build-storybook'
+          - task: Npm@1
+            displayName: 'npm build'
+            inputs:
+              command: 'custom'
+              customCommand: 'run build'
+          - task: SonarQubePrepare@7
+            displayName: 'Prepare SonarQube Analysis'
+            inputs:
+              SonarQube: 'SonarQube'
+              scannerMode: 'CLI'
+              configMode: 'manual'
+              cliProjectKey: '$(Build.definitionName)'
+              cliProjectName: '$(Build.definitionName)'
+              cliProjectVersion: '$(Build.BuildID)'
+              cliSources: '.'
+              extraProperties: 'sonar.verbose=true'
+            continueOnError: true
+          - task: SonarQubeAnalyze@7
+            displayName: 'Run SonarQube Analysis'
+            continueOnError: true
+          - task: SonarQubePublish@7
+            displayName: 'Publish SonarQube Results'
+            inputs:
+              pollingTimeoutSec: '300'
+            continueOnError: true

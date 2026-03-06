@@ -1,0 +1,55 @@
+# v2 SPA Template YAML
+# -----------------
+# Purpose: This YAML template serves as a sample for future Single Page Application (SPA) projects.
+# It is designed to automate the build and deployment processes to various environments.
+#
+# Usage:
+# - Customize the configuration to match the specific requirements of your SPA project.
+# - Configure environment-specific settings, deployment strategies, and triggers as necessary.
+#
+# Deploy Environment Configuration:
+# - You can define environment parameters by passing them as properties of the 'stageObject' object.
+# - Each environment is represented as a key within the 'stageObject' object with the following structure:
+#   - environment: 'intv2'
+#     stageName: 'Integration'
+#     condition: succeeded()
+#     dependsOnStage: 'Build'
+#     loc: 'eastus'
+#     subscriptionCdnName: 'Development-Publish-ADO'
+# - If the parameter 'stageObject' is empty, the default value will be applied.
+
+name: '$(BuildDefinitionName)_$(Year:yyyy).$(Month).$(DayOfMonth)$(Rev:.r)'
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - '*'
+    exclude:
+      - '**/.git/**'
+  pr:
+    - main
+
+resources:
+  repositories:
+    - repository: appTemplates
+      type: git
+      name: DevSecOps/yaml-templates-applications
+      nodejsVersion: '20.12.2'
+
+stages:
+  - template: build/spa/v2-Azure-spa-build.yml@appTemplates
+    parameters:
+      vmImageName: 'windows-latest'
+      appNameAbbreviation: 'Required. Put there application name'
+      isStorybookUsed: false
+      nodejsVersion: '20.12.2'
+
+  - template: deploy/v2-Azure-spa-deployments.yml@appTemplates
+    parameters:
+      appNameAbbreviation: 'Required. Put there application name'
+      resourceGroupName: 'Required. It is used for generating subscriptionName parameter'
+      frontDoorCdn: 'Required. It is used for generating cdnEndpoint parameters'
+      storageAccountName: 'Required. It is used for generating storageName parameters'
+      isStorybookUsed: false
